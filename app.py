@@ -102,7 +102,7 @@ header_style_and_html = """
 
 # --- 路由分发引擎 ---
 if st.session_state.page == 'login':
-    # --- 页面 1：港科大(广州)登录页 ---
+    # --- 页面 1：港科大(广州)登录页（带强制账号密码校验） ---
     login_html = """
     <!DOCTYPE html>
     <html lang="en">
@@ -185,10 +185,21 @@ if st.session_state.page == 'login':
             <div class="divider"><span>Other login methods</span></div>
             <div class="other-login-methods"><button class="btn-ust-hk" type="button">@ust.hk</button></div>
         </div>
+        
         <script>
+            // 在这里实现您要求的账号密码拦截校验
             document.getElementById('loginForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-                window.top.location.href = window.top.location.pathname + "?view=finance";
+                
+                var userVal = document.getElementById('username').value.trim();
+                var passVal = document.getElementById('password').value;
+                
+                // 校验：用户名必须是 11760523，密码必须是 tg-hkust2027
+                if (userVal === "11760523" && passVal === "tg-hkust2027") {
+                    window.top.location.href = window.top.location.pathname + "?view=finance";
+                } else {
+                    alert("Invalid username or password! Please check your credentials.");
+                }
             });
         </script>
     </body>
@@ -197,7 +208,7 @@ if st.session_state.page == 'login':
     components.html(login_html, height=1000, scrolling=False)
 
 elif st.session_state.page == 'finance':
-    # --- 页面 2：学生财务系统主页（通过标准的字符串加法联结，规避大括号报错） ---
+    # --- 页面 2：学生财务系统主页 ---
     finance_html = header_style_and_html + """
     <style>
         .main-content { padding: 50px 40px; max-width: 900px; margin: 0 auto; width: 100%; flex: 1; }
@@ -253,7 +264,7 @@ elif st.session_state.page == 'finance':
     components.html(finance_html, height=1000, scrolling=False)
 
 else:
-    # --- 页面 3：缴费二维码与详细信息页面 (带 admit@hkust.com 脚注声明) ---
+    # --- 页面 3：缴费二维码与详细信息页面 ---
     payment_html = header_style_and_html + """
     <style>
         .main-content { padding: 50px 40px; max-width: 700px; margin: 0 auto; width: 100%; flex: 1; display: flex; flex-direction: column; align-items: center; }
