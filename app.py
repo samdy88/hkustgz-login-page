@@ -40,7 +40,7 @@ query_params = st.query_params
 if 'view' in query_params:
     st.session_state.page = query_params['view']
 
-# --- 统一样式与页眉组件 (高度复刻财务系统蓝色 Header) ---
+# --- 统一样式与页眉组件 (高度复刻财务系统蓝色 Header，不使用 f-string，防止 {} 冲突) ---
 header_style_and_html = """
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -102,7 +102,7 @@ header_style_and_html = """
 
 # --- 路由分发引擎 ---
 if st.session_state.page == 'login':
-    # --- 页面 1：完美的港科大(广州)登录页复刻 ---
+    # --- 页面 1：港科大(广州)登录页 ---
     login_html = """
     <!DOCTYPE html>
     <html lang="en">
@@ -197,37 +197,28 @@ if st.session_state.page == 'login':
     components.html(login_html, height=1000, scrolling=False)
 
 elif st.session_state.page == 'finance':
-    # --- 页面 2：学生财务系统表格主页（姓名、留位费、期限） ---
-    finance_html = f"""
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Student Finance System</title>
-        <style>
-            .main-content {{ padding: 50px 40px; max-width: 900px; margin: 0 auto; width: 100%; flex: 1; }}
-            .page-title {{ font-size: 22px; color: #111; margin-bottom: 30px; font-weight: 600; display: flex; align-items: center; gap: 10px; }}
-            .page-title::before {{ content: ''; display: inline-block; width: 4px; height: 20px; background-color: #004b93; border-radius: 2px; }}
-            
-            .table-container {{ background: white; border-radius: 6px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); border: 1px solid #eef2f5; overflow: hidden; margin-bottom: 35px; }}
-            table {{ width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }}
-            th {{ background-color: #f8fafc; color: #475569; font-weight: 600; padding: 16px 24px; border-bottom: 1px solid #eef2f5; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }}
-            td {{ padding: 18px 24px; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 14px; }}
-            tr:last-child td {{ border-bottom: none; }}
-            
-            .action-area {{ display: flex; justify-content: center; margin-top: 10px; }}
-            .btn-pay {{
-                background-color: #946912; color: white; border: none; padding: 14px 55px; font-size: 15px; border-radius: 4px; cursor: pointer; font-weight: 600;
-                box-shadow: 0 2px 6px rgba(148, 105, 18, 0.2); transition: background 0.2s, transform 0.1s;
-            }
-            .btn-pay:hover {{ background-color: #7d580f; }}
-            .btn-pay:active {{ transform: scale(0.98); }}
-        </style>
-    </head>
+    # --- 页面 2：学生财务系统主页（通过标准的字符串加法联结，规避大括号报错） ---
+    finance_html = header_style_and_html + """
+    <style>
+        .main-content { padding: 50px 40px; max-width: 900px; margin: 0 auto; width: 100%; flex: 1; }
+        .page-title { font-size: 22px; color: #111; margin-bottom: 30px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .page-title::before { content: ''; display: inline-block; width: 4px; height: 20px; background-color: #004b93; border-radius: 2px; }
+        
+        .table-container { background: white; border-radius: 6px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); border: 1px solid #eef2f5; overflow: hidden; margin-bottom: 35px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        th { background-color: #f8fafc; color: #475569; font-weight: 600; padding: 16px 24px; border-bottom: 1px solid #eef2f5; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 18px 24px; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 14px; }
+        tr:last-child td { border-bottom: none; }
+        
+        .action-area { display: flex; justify-content: center; margin-top: 10px; }
+        .btn-pay {
+            background-color: #946912; color: white; border: none; padding: 14px 55px; font-size: 15px; border-radius: 4px; cursor: pointer; font-weight: 600;
+            box-shadow: 0 2px 6px rgba(148, 105, 18, 0.2); transition: background 0.2s, transform 0.1s;
+        }
+        .btn-pay:hover { background-color: #7d580f; }
+        .btn-pay:active { transform: scale(0.98); }
+    </style>
     <body>
-        {header_style_and_html}
-
         <div class="main-content">
             <div class="page-title">Admission Fee & Deposit Statements</div>
             
@@ -263,38 +254,29 @@ elif st.session_state.page == 'finance':
 
 else:
     # --- 页面 3：缴费二维码与详细信息页面 (带 admit@hkust.com 脚注声明) ---
-    payment_html = f"""
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Payment Gateway</title>
-        <style>
-            .main-content {{ padding: 50px 40px; max-width: 700px; margin: 0 auto; width: 100%; flex: 1; display: flex; flex-direction: column; align-items: center; }}
-            .payment-card {{ background: white; border-radius: 8px; width: 100%; padding: 40px; box-shadow: 0 4px 16px rgba(0,0,0,0.05); border: 1px solid #eef2f5; text-align: center; margin-bottom: 40px; }}
-            
-            .section-title {{ font-size: 20px; color: #111; font-weight: 600; margin-bottom: 24px; }}
-            .info-row {{ display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #e2e8f0; font-size: 14px; color: #475569; }}
-            .info-row:last-of-type {{ border-bottom: none; margin-bottom: 20px; }}
-            .info-value {{ font-weight: 600; color: #111; }}
-            .info-value.amount {{ color: #946912; font-size: 18px; }}
-            
-            .qr-container {{ background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 6px; display: inline-block; margin: 15px 0; }}
-            .qr-code {{ width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid #cbd5e1; position: relative; margin: 0 auto; }}
-            .qr-code::before {{
-                content: 'QR CODE'; font-size: 11px; color: #94a3b8; font-weight: 600; letter-spacing: 0.5px;
-            }}
-            .qr-tip {{ font-size: 12px; color: #64748b; margin-top: 10px; line-height: 1.4; }}
-            
-            .support-footer {{ font-size: 13px; color: #64748b; text-align: center; margin-top: auto; padding-bottom: 20px; line-height: 1.5; }}
-            .support-footer a {{ color: #004b93; text-decoration: none; font-weight: 500; }}
-            .support-footer a:hover {{ text-decoration: underline; }}
-        </style>
-    </head>
+    payment_html = header_style_and_html + """
+    <style>
+        .main-content { padding: 50px 40px; max-width: 700px; margin: 0 auto; width: 100%; flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .payment-card { background: white; border-radius: 8px; width: 100%; padding: 40px; box-shadow: 0 4px 16px rgba(0,0,0,0.05); border: 1px solid #eef2f5; text-align: center; margin-bottom: 40px; }
+        
+        .section-title { font-size: 20px; color: #111; font-weight: 600; margin-bottom: 24px; }
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #e2e8f0; font-size: 14px; color: #475569; }
+        .info-row:last-of-type { border-bottom: none; margin-bottom: 20px; }
+        .info-value { font-weight: 600; color: #111; }
+        .info-value.amount { color: #946912; font-size: 18px; }
+        
+        .qr-container { background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 6px; display: inline-block; margin: 15px 0; }
+        .qr-code { width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid #cbd5e1; position: relative; margin: 0 auto; }
+        .qr-code::before {
+            content: 'QR CODE'; font-size: 11px; color: #94a3b8; font-weight: 600; letter-spacing: 0.5px;
+        }
+        .qr-tip { font-size: 12px; color: #64748b; margin-top: 10px; line-height: 1.4; }
+        
+        .support-footer { font-size: 13px; color: #64748b; text-align: center; margin-top: auto; padding-bottom: 20px; line-height: 1.5; }
+        .support-footer a { color: #004b93; text-decoration: none; font-weight: 500; }
+        .support-footer a:hover { text-decoration: underline; }
+    </style>
     <body>
-        {header_style_and_html}
-
         <div class="main-content">
             <div class="payment-card">
                 <div class="section-title">Payment Information</div>
