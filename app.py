@@ -188,17 +188,23 @@ if st.session_state.page == 'login':
         </div>
         
         <script>
-            // 如果成功，触发内嵌状态变更传回顶层
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                var userVal = document.getElementById('username').value.trim();
-                var passVal = document.getElementById('password').value;
-                if (userVal === "11760523" && passVal === "tg-hkust2027") {
-                    window.parent.location.href = window.parent.location.pathname + "?view=finance";
-                } else {
-                    alert("Invalid username or password! Please check your credentials.");
-                }
-            });
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        var userVal = document.getElementById('username').value.trim();
+        var passVal = document.getElementById('password').value;
+        
+        if (userVal === "11760523" && passVal === "tg-hkust2027") {
+            // 如果 window.top 失败，尝试直接改写当前 iframe 容器的参数
+            try {
+                window.top.location.href = window.top.location.pathname + "?view=finance";
+            } catch(err) {
+                window.location.href = window.location.pathname + "?view=finance";
+            }
+        } else {
+            alert("Username or password incorrect!");
+        }
+    });
         </script>
     </body>
     </html>
