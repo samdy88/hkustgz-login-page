@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-# 1. Setup clean seamless page layout
+# 1. 初始化页面配置，使布局撑满全屏
 st.set_page_config(
     page_title="HKUST(GZ) Portal", 
     page_icon="🎓", 
@@ -9,7 +9,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. Inject global CSS to completely hide Streamlit headers/footers for a pure native web feel
+# 2. 全局注入 CSS 隐藏 Streamlit 的原生组件（页眉、页脚、空白边距），确保无缝全屏体验
 st.markdown("""
     <style>
         #MainMenu {visibility: hidden;}
@@ -31,22 +31,22 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 3. Simple State Routing Management (Supports 'login', 'finance', and 'payment')
+# 3. 初始化或获取当前的页面状态 (支持 'login'、'finance' 和 'payment' 三个页面)
 if 'page' not in st.session_state:
     st.session_state.page = 'login'
 
-# Read query parameters from iframe redirect trigger
+# 读取来自内嵌网页跳转传回的 URL 参数
 query_params = st.query_params
 if 'view' in query_params:
     st.session_state.page = query_params['view']
 
-# --- Common Replicated Header Component for Layout Reusability ---
+# --- 统一样式与页眉组件 (高度复刻财务系统蓝色 Header) ---
 header_style_and_html = """
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f4f6f9; min-height: 100vh; display: flex; flex-direction: column; }
         
-        /* High Fidelity Header matching screenshot */
+        /* 高保真复刻页眉通栏 - 对应原图蓝色色调 */
         .header-bar {
             background-color: #004b93; 
             height: 60px;
@@ -100,9 +100,9 @@ header_style_and_html = """
     </div>
 """
 
-# --- View Routing Engine ---
+# --- 路由分发引擎 ---
 if st.session_state.page == 'login':
-    # --- PAGE 1: REPLICATED LOGIN PAGE ---
+    # --- 页面 1：完美的港科大(广州)登录页复刻 ---
     login_html = """
     <!DOCTYPE html>
     <html lang="en">
@@ -197,7 +197,7 @@ if st.session_state.page == 'login':
     components.html(login_html, height=1000, scrolling=False)
 
 elif st.session_state.page == 'finance':
-    # --- PAGE 2: STUDENT FINANCE DASHBOARD ---
+    # --- 页面 2：学生财务系统表格主页（姓名、留位费、期限） ---
     finance_html = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -262,7 +262,7 @@ elif st.session_state.page == 'finance':
     components.html(finance_html, height=1000, scrolling=False)
 
 else:
-    # --- PAGE 3: PAYMENT QR CODE & INFORMATION SUMMARY ---
+    # --- 页面 3：缴费二维码与详细信息页面 (带 admit@hkust.com 脚注声明) ---
     payment_html = f"""
     <!DOCTYPE html>
     <html lang="en">
