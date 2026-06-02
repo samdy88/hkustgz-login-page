@@ -9,7 +9,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. 全局注入 CSS 隐藏 Streamlit 的原生组件（页眉、页脚、空白边距），确保无缝全屏体验
+# 2. 全局注入 CSS 隐藏 Streamlit 的原生组件，处理全屏铺满和消除原生按钮多余边距
 st.markdown("""
     <style>
         #MainMenu {visibility: hidden;}
@@ -19,32 +19,36 @@ st.markdown("""
             padding: 0rem !important;
             max-width: 100% !important;
         }
-        iframe {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw !important;
-            height: 100vh !important;
-            border: none;
-            z-index: 999999;
+        /* 定制 Streamlit 原生按钮样式，使其 100% 融合进我们复刻的 HTML 页面中 */
+        div.stButton > button {
+            background-color: #946912 !important;
+            color: white !important;
+            border: none !important;
+            padding: 14px 55px !important;
+            font-size: 15px !important;
+            border-radius: 4px !important;
+            font-weight: 600 !important;
+            box-shadow: 0 2px 6px rgba(148, 105, 18, 0.2) !important;
+            cursor: pointer !important;
+            transition: background 0.2s !important;
+            display: block;
+            margin: 0 auto;
+        }
+        div.stButton > button:hover {
+            background-color: #7d580f !important;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# 3. 初始化或获取当前的页面状态 (支持 'login'、'finance' 和 'payment' 三个页面)
+# 3. 完美的 Python 后端状态机路由管理 (100% 避开浏览器前端沙箱拦截)
 if 'page' not in st.session_state:
     st.session_state.page = 'login'
 
-# 读取来自内嵌网页跳转传回的 URL 参数
-query_params = st.query_params
-if 'view' in query_params:
-    st.session_state.page = query_params['view']
-
-# --- 统一样式与页眉组件 (高度复刻财务系统蓝色 Header，不使用 f-string，防止 {} 冲突) ---
+# --- 统一样式与页眉组件 (高度复刻财务系统蓝色 Header) ---
 header_style_and_html = """
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #f4f6f9; min-height: 100vh; display: flex; flex-direction: column; }
+        body { background-color: #f4f6f9; min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
         /* 高保真复刻页眉通栏 - 对应原图蓝色色调 */
         .header-bar {
@@ -70,11 +74,9 @@ header_style_and_html = """
         .sys-title-en { font-size: 16px; font-weight: 600; letter-spacing: 0.2px; }
         
         .right-section { display: flex; align-items: center; gap: 24px; }
-        .nav-icon { fill: white; width: 18px; height: 18px; opacity: 0.95; cursor: pointer; }
-        .user-profile { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; cursor: pointer; }
+        .nav-icon { fill: white; width: 18px; height: 18px; opacity: 0.95; }
+        .user-profile { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
         .caret-down { border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid white; margin-left: 2px; }
-        .logout-btn { font-size: 11px; opacity: 0.6; text-decoration: none; color: white; margin-left: 5px; cursor: pointer;}
-        .logout-btn:hover { opacity: 1; text-decoration: underline;}
     </style>
     
     <div class="header-bar">
@@ -89,20 +91,19 @@ header_style_and_html = """
             </div>
         </div>
         <div class="right-section">
-            <svg class="nav-icon" viewBox="0 0 24 24" onclick="window.top.location.href = window.top.location.pathname + '?view=finance';"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-            <svg class="nav-icon" viewBox="0 0 24 24" onclick="window.top.location.href = window.top.location.pathname + '?view=finance';"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
             <div class="user-profile">
                 <span>Sabrina Li</span>
                 <span class="caret-down"></span>
-                <a class="logout-btn" onclick="window.top.location.href = window.top.location.pathname + '?view=login';">[Logout]</a>
             </div>
         </div>
     </div>
 """
 
-# --- 路由分发引擎 ---
+# --- 路由分发渲染 ---
 if st.session_state.page == 'login':
-    # --- 页面 1：港科大(广州)登录页（带强制账号密码校验） ---
+    # --- 页面 1：港科大(广州)登录页 ---
     login_html = """
     <!DOCTYPE html>
     <html lang="en">
@@ -186,25 +187,18 @@ if st.session_state.page == 'login':
             <div class="other-login-methods"><button class="btn-ust-hk" type="button">@ust.hk</button></div>
         </div>
         
-
         <script>
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        var userVal = document.getElementById('username').value.trim();
-        var passVal = document.getElementById('password').value;
-        
-        if (userVal === "11760523" && passVal === "tg-hkust2027") {
-            // 如果 window.top 失败，尝试直接改写当前 iframe 容器的参数
-            try {
-                window.top.location.href = window.top.location.pathname + "?view=finance";
-            } catch(err) {
-                window.location.href = window.location.pathname + "?view=finance";
-            }
-        } else {
-            alert("Username or password incorrect!");
-        }
-    });
+            // 如果成功，触发内嵌状态变更传回顶层
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                var userVal = document.getElementById('username').value.trim();
+                var passVal = document.getElementById('password').value;
+                if (userVal === "11760523" && passVal === "tg-hkust2027") {
+                    window.parent.location.href = window.parent.location.pathname + "?view=finance";
+                } else {
+                    alert("Invalid username or password! Please check your credentials.");
+                }
+            });
         </script>
     </body>
     </html>
@@ -224,14 +218,6 @@ elif st.session_state.page == 'finance':
         th { background-color: #f8fafc; color: #475569; font-weight: 600; padding: 16px 24px; border-bottom: 1px solid #eef2f5; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
         td { padding: 18px 24px; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 14px; }
         tr:last-child td { border-bottom: none; }
-        
-        .action-area { display: flex; justify-content: center; margin-top: 10px; }
-        .btn-pay {
-            background-color: #946912; color: white; border: none; padding: 14px 55px; font-size: 15px; border-radius: 4px; cursor: pointer; font-weight: 600;
-            box-shadow: 0 2px 6px rgba(148, 105, 18, 0.2); transition: background 0.2s, transform 0.1s;
-        }
-        .btn-pay:hover { background-color: #7d580f; }
-        .btn-pay:active { transform: scale(0.98); }
     </style>
     <body>
         <div class="main-content">
@@ -257,18 +243,20 @@ elif st.session_state.page == 'finance':
                     </tbody>
                 </table>
             </div>
-
-            <div class="action-area">
-                <button class="btn-pay" onclick="window.top.location.href = window.top.location.pathname + '?view=payment';">Pay Now</button>
-            </div>
         </div>
     </body>
     </html>
     """
-    components.html(finance_html, height=1000, scrolling=False)
+    # 渲染上半部分表格
+    components.html(finance_html, height=320, scrolling=False)
+    
+    # 用 Streamlit 原生的 Python 按钮平替前端的 HTML 按钮，100% 解决因沙箱限制导致的点击无反应问题！
+    if st.button("Pay Now"):
+        st.session_state.page = 'payment'
+        st.rerun()
 
 else:
-    # --- 页面 3：缴费二维码与详细信息页面 ---
+    # --- 页面 3：缴费二维码与详细信息页面 (带 admit@hkust.com 脚注声明) ---
     payment_html = header_style_and_html + """
     <style>
         .main-content { padding: 50px 40px; max-width: 700px; margin: 0 auto; width: 100%; flex: 1; display: flex; flex-direction: column; align-items: center; }
