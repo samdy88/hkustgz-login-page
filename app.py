@@ -148,9 +148,13 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 4. 后台简单逻辑验证
+
+
+# 4. 后台简单逻辑验证（更新后）
 if submit_button:
     if username and password:
-        st.success(f"正在尝试登录: {username}")
+        st.success(f"🎉 登录成功！欢迎，{username}。")
+        st.balloons()  # 撒花特效
+        st.info("👈 请使用左侧边栏的导航菜单进入关联页面。")
     else:
         st.error("请输入用户名和密码")
