@@ -31,7 +31,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 3. Simple State Routing Management
+# 3. Simple State Routing Management (Supports 'login', 'finance', and 'payment')
 if 'page' not in st.session_state:
     st.session_state.page = 'login'
 
@@ -40,9 +40,69 @@ query_params = st.query_params
 if 'view' in query_params:
     st.session_state.page = query_params['view']
 
+# --- Common Replicated Header Component for Layout Reusability ---
+header_style_and_html = """
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f4f6f9; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        /* High Fidelity Header matching screenshot */
+        .header-bar {
+            background-color: #004b93; 
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            color: white;
+        }
+        .left-section { display: flex; align-items: center; }
+        .logo-container { display: flex; align-items: center; }
+        .mini-crest {
+            width: 20px; height: 26px; background: white; border-radius: 1px; margin-right: 8px; position: relative;
+        }
+        .mini-crest::before {
+            content: ''; position: absolute; top: -4px; left: 5px; width: 10px; height: 10px; background: #b38728; border-radius: 50%;
+        }
+        .uni-title-en { font-size: 10px; font-weight: bold; line-height: 1.15; letter-spacing: 0.1px; color: #ffffff; }
+        .vertical-divider { width: 1px; height: 30px; background-color: rgba(255,255,255,0.3); margin: 0 18px; }
+        .sys-title-container { display: flex; flex-direction: column; }
+        .sys-title-en { font-size: 16px; font-weight: 600; letter-spacing: 0.2px; }
+        
+        .right-section { display: flex; align-items: center; gap: 24px; }
+        .nav-icon { fill: white; width: 18px; height: 18px; opacity: 0.95; cursor: pointer; }
+        .user-profile { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; cursor: pointer; }
+        .caret-down { border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid white; margin-left: 2px; }
+        .logout-btn { font-size: 11px; opacity: 0.6; text-decoration: none; color: white; margin-left: 5px; cursor: pointer;}
+        .logout-btn:hover { opacity: 1; text-decoration: underline;}
+    </style>
+    
+    <div class="header-bar">
+        <div class="left-section">
+            <div class="logo-container">
+                <div class="mini-crest"></div>
+                <div class="uni-title-en">THE HONG KONG<br>UNIVERSITY OF SCIENCE AND<br>TECHNOLOGY (GUANGZHOU)</div>
+            </div>
+            <div class="vertical-divider"></div>
+            <div class="sys-title-container">
+                <div class="sys-title-en">Student Finance System</div>
+            </div>
+        </div>
+        <div class="right-section">
+            <svg class="nav-icon" viewBox="0 0 24 24" onclick="window.top.location.href = window.top.location.pathname + '?view=finance';"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <svg class="nav-icon" viewBox="0 0 24 24" onclick="window.top.location.href = window.top.location.pathname + '?view=finance';"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            <div class="user-profile">
+                <span>Sabrina Li</span>
+                <span class="caret-down"></span>
+                <a class="logout-btn" onclick="window.top.location.href = window.top.location.pathname + '?view=login';">[Logout]</a>
+            </div>
+        </div>
+    </div>
+"""
+
 # --- View Routing Engine ---
 if st.session_state.page == 'login':
-    # --- VIEW A: REPLICATED LOGIN PAGE ---
+    # --- PAGE 1: REPLICATED LOGIN PAGE ---
     login_html = """
     <!DOCTYPE html>
     <html lang="en">
@@ -136,9 +196,9 @@ if st.session_state.page == 'login':
     """
     components.html(login_html, height=1000, scrolling=False)
 
-else:
-    # --- VIEW B: STUDENT FINANCE SYSTEM PAGE ---
-    finance_html = """
+elif st.session_state.page == 'finance':
+    # --- PAGE 2: STUDENT FINANCE DASHBOARD ---
+    finance_html = f"""
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -146,81 +206,127 @@ else:
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Student Finance System</title>
         <style>
-            * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-            body { background-color: #f4f6f9; min-height: 100vh; display: flex; flex-direction: column; }
+            .main-content {{ padding: 50px 40px; max-width: 900px; margin: 0 auto; width: 100%; flex: 1; }}
+            .page-title {{ font-size: 22px; color: #111; margin-bottom: 30px; font-weight: 600; display: flex; align-items: center; gap: 10px; }}
+            .page-title::before {{ content: ''; display: inline-block; width: 4px; height: 20px; background-color: #004b93; border-radius: 2px; }}
             
-            /* High Fidelity Header matching screenshot */
-            .header-bar {
-                background-color: #004b93; 
-                height: 60px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 0 30px;
-                color: white;
-            }
-            .left-section { display: flex; align-items: center; }
-            .logo-container { display: flex; align-items: center; }
-            .mini-crest {
-                width: 20px; height: 26px; background: white; border-radius: 1px; margin-right: 8px; position: relative;
-            }
-            .mini-crest::before {
-                content: ''; position: absolute; top: -4px; left: 5px; width: 10px; height: 10px; background: #b38728; border-radius: 50%;
-            }
-            .uni-title-en { font-size: 10px; font-weight: bold; line-height: 1.15; letter-spacing: 0.1px; color: #ffffff; }
-            .vertical-divider { width: 1px; height: 30px; background-color: rgba(255,255,255,0.3); margin: 0 18px; }
-            .sys-title-container { display: flex; flex-direction: column; }
-            .sys-title-en { font-size: 16px; font-weight: 600; letter-spacing: 0.2px; }
+            .table-container {{ background: white; border-radius: 6px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); border: 1px solid #eef2f5; overflow: hidden; margin-bottom: 35px; }}
+            table {{ width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }}
+            th {{ background-color: #f8fafc; color: #475569; font-weight: 600; padding: 16px 24px; border-bottom: 1px solid #eef2f5; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }}
+            td {{ padding: 18px 24px; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 14px; }}
+            tr:last-child td {{ border-bottom: none; }}
             
-            .right-section { display: flex; align-items: center; gap: 24px; }
-            .nav-icon { fill: white; width: 18px; height: 18px; opacity: 0.95; cursor: pointer; }
-            .user-profile { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; cursor: pointer; }
-            .caret-down { border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid white; margin-left: 2px; }
-
-            /* Dashboard Main Content Area */
-            .main-content { padding: 50px 40px; max-width: 1000px; margin: 0 auto; width: 100%; flex: 1; }
-            .page-title { font-size: 22px; color: #111; margin-bottom: 30px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-            .page-title::before { content: ''; display: inline-block; width: 4px; height: 20px; background-color: #004b93; border-radius: 2px; }
-            
-            /* Clean Table Container */
-            .table-container { background: white; border-radius: 6px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); border: 1px solid #eef2f5; overflow: hidden; margin-bottom: 35px; }
-            table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-            th { background-color: #f8fafc; color: #475569; font-weight: 600; padding: 16px 24px; border-bottom: 1px solid #eef2f5; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
-            td { padding: 18px 24px; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 14px; }
-            tr:last-child td { border-bottom: none; }
-            
-            /* Action Button Centering and Styling */
-            .action-area { display: flex; justify-content: center; margin-top: 10px; }
-            .btn-pay {
-                background-color: #946912; /* Golden Amber Theme Color */
-                color: white; 
-                border: none; 
-                padding: 14px 45px; 
-                font-size: 15px; 
-                border-radius: 4px; 
-                cursor: pointer; 
-                font-weight: 600;
-                box-shadow: 0 2px 6px rgba(148, 105, 18, 0.2);
-                transition: background 0.2s, transform 0.1s;
+            .action-area {{ display: flex; justify-content: center; margin-top: 10px; }}
+            .btn-pay {{
+                background-color: #946912; color: white; border: none; padding: 14px 55px; font-size: 15px; border-radius: 4px; cursor: pointer; font-weight: 600;
+                box-shadow: 0 2px 6px rgba(148, 105, 18, 0.2); transition: background 0.2s, transform 0.1s;
             }
-            .btn-pay:hover { background-color: #7d580f; }
-            .btn-pay:active { transform: scale(0.98); }
-
-            .logout-btn { font-size: 11px; opacity: 0.6; text-decoration: none; color: white; margin-left: 5px;}
-            .logout-btn:hover { opacity: 1; text-decoration: underline;}
+            .btn-pay:hover {{ background-color: #7d580f; }}
+            .btn-pay:active {{ transform: scale(0.98); }}
         </style>
     </head>
     <body>
-        <div class="header-bar">
-            <div class="left-section">
-                <div class="logo-container">
-                    <div class="mini-crest"></div>
-                    <div class="uni-title-en">THE HONG KONG<br>UNIVERSITY OF SCIENCE AND<br>TECHNOLOGY (GUANGZHOU)</div>
+        {header_style_and_html}
+
+        <div class="main-content">
+            <div class="page-title">Admission Fee & Deposit Statements</div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Fee Description</th>
+                            <th>Due Date</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-weight: 500;">Sabrina Li</td>
+                            <td>Admission Deposit</td>
+                            <td style="color: #d9534f; font-weight: 500;">June 30, 2026</td>
+                            <td style="font-weight: 600; color: #111;">¥ 20,000.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="action-area">
+                <button class="btn-pay" onclick="window.top.location.href = window.top.location.pathname + '?view=payment';">Pay Now</button>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    components.html(finance_html, height=1000, scrolling=False)
+
+else:
+    # --- PAGE 3: PAYMENT QR CODE & INFORMATION SUMMARY ---
+    payment_html = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Payment Gateway</title>
+        <style>
+            .main-content {{ padding: 50px 40px; max-width: 700px; margin: 0 auto; width: 100%; flex: 1; display: flex; flex-direction: column; align-items: center; }}
+            .payment-card {{ background: white; border-radius: 8px; width: 100%; padding: 40px; box-shadow: 0 4px 16px rgba(0,0,0,0.05); border: 1px solid #eef2f5; text-align: center; margin-bottom: 40px; }}
+            
+            .section-title {{ font-size: 20px; color: #111; font-weight: 600; margin-bottom: 24px; }}
+            .info-row {{ display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #e2e8f0; font-size: 14px; color: #475569; }}
+            .info-row:last-of-type {{ border-bottom: none; margin-bottom: 20px; }}
+            .info-value {{ font-weight: 600; color: #111; }}
+            .info-value.amount {{ color: #946912; font-size: 18px; }}
+            
+            .qr-container {{ background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 6px; display: inline-block; margin: 15px 0; }}
+            .qr-code {{ width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid #cbd5e1; position: relative; margin: 0 auto; }}
+            .qr-code::before {{
+                content: 'QR CODE'; font-size: 11px; color: #94a3b8; font-weight: 600; letter-spacing: 0.5px;
+            }}
+            .qr-tip {{ font-size: 12px; color: #64748b; margin-top: 10px; line-height: 1.4; }}
+            
+            .support-footer {{ font-size: 13px; color: #64748b; text-align: center; margin-top: auto; padding-bottom: 20px; line-height: 1.5; }}
+            .support-footer a {{ color: #004b93; text-decoration: none; font-weight: 500; }}
+            .support-footer a:hover {{ text-decoration: underline; }}
+        </style>
+    </head>
+    <body>
+        {header_style_and_html}
+
+        <div class="main-content">
+            <div class="payment-card">
+                <div class="section-title">Payment Information</div>
+                
+                <div class="info-row">
+                    <span>Student Name:</span>
+                    <span class="info-value">Sabrina Li</span>
                 </div>
-                <div class="vertical-divider"></div>
-                <div class="sys-title-container">
-                    <div class="sys-title-en">Student Finance System</div>
+                <div class="info-row">
+                    <span>Fee Type:</span>
+                    <span class="info-value">Admission Deposit</span>
+                </div>
+                <div class="info-row">
+                    <span>Amount Due:</span>
+                    <span class="info-value amount">¥ 20,000.00</span>
+                </div>
+                
+                <div class="qr-container">
+                    <div class="qr-code">
+                        <div style="position: absolute; top:0; left:0; width:30px; height:30px; border-bottom:4px solid #004b93; border-right:4px solid #004b93;"></div>
+                        <div style="position: absolute; bottom:0; right:0; width:30px; height:30px; border-top:4px solid #004b93; border-left:4px solid #004b93;"></div>
+                    </div>
+                    <p class="qr-tip">Please scan this QR code to complete your payment transaction securely.</p>
                 </div>
             </div>
-            <div class="right-section">
-                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-
+
+            <div class="support-footer">
+                If you have any questions regarding your payment, please contact us at: <br>
+                <a href="mailto:admit@hkust.com">admit@hkust.com</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    components.html(payment_html, height=1000, scrolling=False)
