@@ -186,21 +186,25 @@ if st.session_state.page == 'login':
             <div class="other-login-methods"><button class="btn-ust-hk" type="button">@ust.hk</button></div>
         </div>
         
+
         <script>
-            // 在这里实现您要求的账号密码拦截校验
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                var userVal = document.getElementById('username').value.trim();
-                var passVal = document.getElementById('password').value;
-                
-                // 校验：用户名必须是 11760523，密码必须是 tg-hkust2027
-                if (userVal === "11760523" && passVal === "tg-hkust2027") {
-                    window.top.location.href = window.top.location.pathname + "?view=finance";
-                } else {
-                    alert("Invalid username or password! Please check your credentials.");
-                }
-            });
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        var userVal = document.getElementById('username').value.trim();
+        var passVal = document.getElementById('password').value;
+        
+        if (userVal === "11760523" && passVal === "tg-hkust2027") {
+            // 如果 window.top 失败，尝试直接改写当前 iframe 容器的参数
+            try {
+                window.top.location.href = window.top.location.pathname + "?view=finance";
+            } catch(err) {
+                window.location.href = window.location.pathname + "?view=finance";
+            }
+        } else {
+            alert("Username or password incorrect!");
+        }
+    });
         </script>
     </body>
     </html>
