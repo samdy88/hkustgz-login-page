@@ -5,7 +5,7 @@ import os
 
 # 1. 初始化全屏配置
 st.set_page_config(
-    page_title="HKUST(GZ) Portal", 
+    page_title="HKUST Portal", 
     page_icon="🎓", 
     layout="wide", 
     initial_sidebar_state="collapsed"
