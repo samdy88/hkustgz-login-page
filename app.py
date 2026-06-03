@@ -65,7 +65,7 @@ monolithic_html = """
         /* ==================== 页面 1：高保真登录页样式 ==================== */
         #login-page {
             height: 100vh; display: flex; justify-content: center; align-items: center;
-            background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80') no-repeat center center;
+            background: url('https://cdn.i-scmp.com/sites/default/files/styles/1200x800/public/d8/images/methode/2021/05/19/eac9bf90-b7e2-11eb-9461-e80e43f535ad_image_hires_163959.jpg?itok=ZKnOYwta&v=1621413607') no-repeat center center;
             background-size: cover; position: relative; overflow: hidden;
         }
         #login-page::before {
@@ -169,8 +169,8 @@ monolithic_html = """
             <h2>Login</h2>
             <form id="loginForm">
                 <div class="form-group">
-                    <label>GZ campus username</label>
-                    <input type="text" id="username" placeholder="without(@hkust-gz.edu.cn)" required autocomplete="off">
+                    <label>Campus username</label>
+                    <input type="text" id="username" placeholder="Payment Number" required autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
@@ -182,8 +182,6 @@ monolithic_html = """
                     <a href="#" style="color: #946912; text-decoration: none;">Forget My Password</a>
                 </div>
             </form>
-            <div class="divider"><span>Other login methods</span></div>
-            <button class="btn-ust-hk">@ust.hk</button>
         </div>
     </div>
 
