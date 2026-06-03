@@ -111,6 +111,7 @@ monolithic_html = """
         body { background-color: #f4f6f9; min-height: 100vh; }
         .header-bar {
             background-color: #004b93; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; color: white;
+            position: relative; z-index: 100;
         }
         .left-section { display: flex; align-items: center; }
         
@@ -126,8 +127,59 @@ monolithic_html = """
         .sys-title-en { font-size: 16px; font-weight: 600; letter-spacing: 0.2px; }
         .right-section { display: flex; align-items: center; gap: 24px; }
         .nav-icon { fill: white; width: 18px; height: 18px; opacity: 0.95; cursor: pointer; }
-        .user-profile { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
+        
+        /* ⚙️ 新增：高保真响应式下拉菜单容器与视觉动效样式 */
+        .user-menu-container {
+            position: relative;
+            display: inline-block;
+        }
+        .user-profile { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            font-size: 14px; 
+            font-weight: 500; 
+            cursor: pointer; 
+            padding: 5px 10px;
+            border-radius: 4px;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+        .user-profile:hover { background-color: rgba(255,255,255,0.1); }
         .caret-down { border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid white; margin-left: 2px; }
+        
+        /* 下拉展开的悬浮菜单卡片 */
+        .dropdown-card {
+            display: none; /* 默认隐藏 */
+            position: absolute;
+            right: 0;
+            top: 40px;
+            background-color: white;
+            min-width: 210px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            z-index: 999;
+        }
+        .dropdown-card a {
+            color: #334155;
+            padding: 12px 18px;
+            text-decoration: none;
+            display: block;
+            font-size: 13.5px;
+            font-weight: 500;
+            text-align: left;
+            transition: background-color 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+        .dropdown-card a:hover {
+            background-color: #f1f5f9;
+            color: #004b93;
+        }
+        .dropdown-card.show {
+            display: block;
+        }
 
         /* ==================== 页面 2：财务报表页样式 ==================== */
         .main-content { padding: 50px 40px; max-width: 900px; margin: 0 auto; width: 100%; text-align: left; }
@@ -200,10 +252,17 @@ monolithic_html = """
             <div class="right-section">
                 <svg class="nav-icon" viewBox="0 0 24 24" onclick="showPage('finance-page')"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                 <svg class="nav-icon" viewBox="0 0 24 24" onclick="showPage('finance-page')"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-                <div class="user-profile">
-                    <span>Tao Ge</span>
-                    <span class="caret-down"></span>
+                
+                <div class="user-menu-container">
+                    <div class="user-profile" id="userMenuBtnA">
+                        <span>Tao Ge</span>
+                        <span class="caret-down"></span>
+                    </div>
+                    <div class="dropdown-card" id="dropdownMenuA">
+                        <a onclick="showPage('finance-page')">💳 Student Finance System</a>
+                    </div>
                 </div>
+                
             </div>
         </div>
 
@@ -247,10 +306,17 @@ monolithic_html = """
             <div class="right-section">
                 <svg class="nav-icon" viewBox="0 0 24 24" onclick="showPage('finance-page')"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                 <svg class="nav-icon" viewBox="0 0 24 24" onclick="showPage('finance-page')"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-                <div class="user-profile">
-                    <span>Tao Ge</span>
-                    <span class="caret-down"></span>
+                
+                <div class="user-menu-container">
+                    <div class="user-profile" id="userMenuBtnB">
+                        <span>Tao Ge</span>
+                        <span class="caret-down"></span>
+                    </div>
+                    <div class="dropdown-card" id="dropdownMenuB">
+                        <a onclick="showPage('finance-page')">💳 Student Finance System</a>
+                    </div>
                 </div>
+                
             </div>
         </div>
 
@@ -290,12 +356,36 @@ monolithic_html = """
             document.getElementById('finance-page').style.display = 'none';
             document.getElementById('payment-page').style.display = 'none';
             
+            // 切换页面的时刻，强行顺手把下拉框关闭，防止浮窗遗留在下一页
+            document.getElementById('dropdownMenuA').classList.remove('show');
+            document.getElementById('dropdownMenuB').classList.remove('show');
+            
             if(pageId === 'login-page') {
                 document.getElementById('login-page').style.display = 'flex';
             } else {
                 document.getElementById(pageId).style.display = 'block';
             }
         }
+
+        // 🛠️ 修改点 3：编写纯前端点击展开、收起以及点击外部空白区域智能自动关闭的高性能交互脚本
+        function toggleDropdown(e, menuId) {
+            e.stopPropagation(); // 关键！阻止事件向上传递冒泡，否则会导致刚开就碰上了全局关闭事件
+            var menu = document.getElementById(menuId);
+            menu.classList.toggle('show');
+        }
+
+        document.getElementById('userMenuBtnA').addEventListener('click', function(e) {
+            toggleDropdown(e, 'dropdownMenuA');
+        });
+        document.getElementById('userMenuBtnB').addEventListener('click', function(e) {
+            toggleDropdown(e, 'dropdownMenuB');
+        });
+
+        // 监听全局：只要用户点按了非菜单区的任意空白地方，一律让菜单归位收起
+        window.addEventListener('click', function() {
+            document.getElementById('dropdownMenuA').classList.remove('show');
+            document.getElementById('dropdownMenuB').classList.remove('show');
+        });
 
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
