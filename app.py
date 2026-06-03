@@ -1,5 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
+import base64
+import os
 
 # 1. 初始化全屏配置
 st.set_page_config(
@@ -9,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. 全局注入 CSS 隐藏 Streamlit 原生组件，确保 iframe 容器撑满整个显示器
+# 2. 全局注入 CSS 确保 iframe 铺满全屏
 st.markdown("""
     <style>
         #MainMenu {visibility: hidden;}
@@ -31,7 +33,25 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 3. 将所有页面写在同一个 HTML 闭环中，通过 DOM 操作实现 100% 稳定的无痕切换
+# ⚙️ 核心修复：现在图片移到了外面，我们直接在根目录下读取 "logo_white.png"
+def get_base64_image(image_path):
+    if os.path.exists(image_path):
+        with open(image_path, "rb") as img_file:
+            encoded = base64.b64encode(img_file.read()).decode()
+            ext = image_path.split(".")[-1].lower()
+            if ext in ["jpg", "jpeg"]:
+                return f"data:image/jpeg;base64,{encoded}"
+            else:
+                return f"data:image/png;base64,{encoded}"
+    else:
+        # 如果找不到本地图片，返回一个在线备用提示图，确保系统不崩溃
+        return "https://via.placeholder.com/150x38/004b93/ffffff?text=Logo+Not+Found"
+
+# 🔍 路径已更新：直接读取根目录下的文件名
+logo_path = "logo_white.png" 
+logo_base64 = get_base64_image(logo_path)
+
+# 3. 将所有页面写在同一个 HTML 中，通过 JS 实现纯前端页面无感切换
 monolithic_html = """
 <!DOCTYPE html>
 <html lang="en">
@@ -88,14 +108,15 @@ monolithic_html = """
             background-color: #004b93; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; color: white;
         }
         .left-section { display: flex; align-items: center; }
-        .logo-container { display: flex; align-items: center; }
-        .mini-crest {
-            width: 20px; height: 26px; background: white; border-radius: 1px; margin-right: 8px; position: relative;
+        
+        /* 学校真实 Logo 的自适应样式 */
+        .uni-logo {
+            height: 36px;
+            width: auto;
+            display: block;
+            object-fit: contain;
         }
-        .mini-crest::before {
-            content: ''; position: absolute; top: -4px; left: 5px; width: 10px; height: 10px; background: #b38728; border-radius: 50%;
-        }
-        .uni-title-en { font-size: 10px; font-weight: bold; line-height: 1.15; letter-spacing: 0.1px; color: #ffffff; text-align: left; }
+        
         .vertical-divider { width: 1px; height: 30px; background-color: rgba(255,255,255,0.3); margin: 0 18px; }
         .sys-title-en { font-size: 16px; font-weight: 600; letter-spacing: 0.2px; }
         .right-section { display: flex; align-items: center; gap: 24px; }
@@ -166,10 +187,10 @@ monolithic_html = """
         </div>
     </div>
 
-<div id="finance-page" style="display: none;">
+    <div id="finance-page" style="display: none;">
         <div class="header-bar">
             <div class="left-section">
-                <img class="uni-logo" src="app/static/logo_white.png" alt="HKUST(GZ) Logo">
+                <img class="uni-logo" src="THE_LOGO_WILL_BE_INJECTED_HERE_A" alt="HKUST(GZ) Logo">
                 
                 <div class="vertical-divider"></div>
                 
@@ -215,10 +236,10 @@ monolithic_html = """
         </div>
     </div>
 
-<div id="payment-page" style="display: none;">
+    <div id="payment-page" style="display: none;">
         <div class="header-bar">
             <div class="left-section">
-                <img class="uni-logo" src="app/static/logo_white.png" alt="HKUST(GZ) Logo">
+                <img class="uni-logo" src="THE_LOGO_WILL_BE_INJECTED_HERE_B" alt="HKUST(GZ) Logo">
                 <div class="vertical-divider"></div>
                 <div class="sys-title-container">
                     <div class="sys-title-en">Student Finance System</div>
@@ -266,12 +287,10 @@ monolithic_html = """
 
     <script>
         function showPage(pageId) {
-            // 隐藏所有页面
             document.getElementById('login-page').style.display = 'none';
             document.getElementById('finance-page').style.display = 'none';
             document.getElementById('payment-page').style.display = 'none';
             
-            // 显示目标页面
             if(pageId === 'login-page') {
                 document.getElementById('login-page').style.display = 'flex';
             } else {
@@ -279,27 +298,28 @@ monolithic_html = """
             }
         }
 
-        // 1. 处理页面 1 的账户密码验证表单提交
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             var userVal = document.getElementById('username').value.trim();
             var passVal = document.getElementById('password').value;
 
             if (userVal === "11760523" && passVal === "tg-hkust2027") {
-                showPage('finance-page'); // 完美切入第二页
+                showPage('finance-page');
             } else {
                 alert("Invalid username or password! Please check your credentials.");
             }
         });
 
-        // 2. 处理页面 2 的 Pay Now 按钮点击
         document.getElementById('payNowBtn').addEventListener('click', function() {
-            showPage('payment-page'); // 完美切入第三页
+            showPage('payment-page');
         });
     </script>
 </body>
 </html>
 """
 
-# 用完全纯净的 iframe 直接无缝托管这套高保真代码
+# 安全替换占位符
+monolithic_html = monolithic_html.replace("THE_LOGO_WILL_BE_INJECTED_HERE_A", logo_base64)
+monolithic_html = monolithic_html.replace("THE_LOGO_WILL_BE_INJECTED_HERE_B", logo_base64)
+
 components.html(monolithic_html, height=1200, scrolling=False)
