@@ -189,8 +189,6 @@ monolithic_html = """
     <div id="finance-page" style="display: none;">
         <div class="header-bar">
             <div class="left-section">
-                <img class="uni-logo" src="app/static/logo_white.png" alt="HKUST(GZ) Logo">
-
                 <img class="uni-logo" src="THE_FINANCE_LOGO_WILL_BE_INJECTED_HERE_A" alt="HKUST(GZ) Logo">
                 
                 <div class="vertical-divider"></div>
@@ -240,8 +238,6 @@ monolithic_html = """
     <div id="payment-page" style="display: none;">
         <div class="header-bar">
             <div class="left-section">
-                <img class="uni-logo" src="app/static/logo_white.png" alt="HKUST(GZ) Logo">
-
                 <img class="uni-logo" src="THE_FINANCE_LOGO_WILL_BE_INJECTED_HERE_B" alt="HKUST(GZ) Logo">
                 <div class="vertical-divider"></div>
                 <div class="sys-title-container">
