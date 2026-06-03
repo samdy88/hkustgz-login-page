@@ -166,14 +166,13 @@ monolithic_html = """
         </div>
     </div>
 
-    <div id="finance-page" style="display: none;">
+<div id="finance-page" style="display: none;">
         <div class="header-bar">
             <div class="left-section">
-                <div class="logo-container">
-                    <div class="mini-crest"></div>
-                    <div class="uni-title-en">THE HONG KONG<br>UNIVERSITY OF SCIENCE AND<br>TECHNOLOGY (GUANGZHOU)</div>
-                </div>
+                <img class="uni-logo" src="app/static/logo_white.png" alt="HKUST(GZ) Logo">
+                
                 <div class="vertical-divider"></div>
+                
                 <div class="sys-title-container">
                     <div class="sys-title-en">Student Finance System</div>
                 </div>
@@ -216,13 +215,10 @@ monolithic_html = """
         </div>
     </div>
 
-    <div id="payment-page" style="display: none;">
+<div id="payment-page" style="display: none;">
         <div class="header-bar">
             <div class="left-section">
-                <div class="logo-container">
-                    <div class="mini-crest"></div>
-                    <div class="uni-title-en">THE HONG KONG<br>UNIVERSITY OF SCIENCE AND<br>TECHNOLOGY (GUANGZHOU)</div>
-                </div>
+                <img class="uni-logo" src="app/static/logo_white.png" alt="HKUST(GZ) Logo">
                 <div class="vertical-divider"></div>
                 <div class="sys-title-container">
                     <div class="sys-title-en">Student Finance System</div>
