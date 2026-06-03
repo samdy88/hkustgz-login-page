@@ -33,7 +33,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ⚙️ 核心修复：现在图片移到了外面，我们直接在根目录下读取 "logo_white.png"
+# ⚙️ 核心处理函数：读取本地图片并转为 Base64 编码，防止跨域挂图
 def get_base64_image(image_path):
     if os.path.exists(image_path):
         with open(image_path, "rb") as img_file:
@@ -44,16 +44,17 @@ def get_base64_image(image_path):
             else:
                 return f"data:image/png;base64,{encoded}"
     else:
-        # 如果找不到本地图片，返回一个在线备用提示图，确保系统不崩溃
-        return "https://via.placeholder.com/150x38/004b93/ffffff?text=Logo+Not+Found"
+        # 如果找不到本地图片，返回一个在线备用提示图
+        return "https://via.placeholder.com/180x180/f8fafc/64748b?text=QR+CODE"
 
-# ======= 这是本次改动新增/修改的地方 =======
-login_logo_path = "logo-en.png"           # 🔍 新增：指定登录页面的英文 Logo 文件名
-finance_logo_path = "logo_white.png"       # 🔍 保留：指定财务/缴费系统的白色页眉 Logo
+# 🔍 精准读取您放在根目录下的三个本地图片文件
+login_logo_path = "logo-en.png"           # 登录页面的长条 Logo
+finance_logo_path = "logo_white.png"       # 财务页面的白色页眉 Logo
+qr_code_path = "qr_code.png"               # ⚙️ 新增：真实二维码图片路径
 
-login_logo_base64 = get_base64_image(login_logo_path)      # 将登录 Logo 转化成二进制编码
-finance_logo_base64 = get_base64_image(finance_logo_path)  # 将页眉 Logo 转化成二进制编码
-# =========================================
+login_logo_base64 = get_base64_image(login_logo_path)
+finance_logo_base64 = get_base64_image(finance_logo_path)
+qr_code_base64 = get_base64_image(qr_code_path) # ⚙️ 新增：转换二维码编码
 
 # 3. 将所有页面写在同一个 HTML 中，通过 JS 实现纯前端页面无感切换
 monolithic_html = """
@@ -80,12 +81,11 @@ monolithic_html = """
             position: relative; z-index: 2; background: rgba(255, 255, 255, 0.98);
             width: 420px; padding: 35px 40px; border-radius: 4px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
-        /* 控制登录框顶部新 logo-en.png 的样式 */
        .login-logo {
            max-width: 100%;
-           height: 50px;             /* 📐 限制新图片的高度，防止太长或变形 */
+           height: 50px;
            display: block;
-           margin: 0 auto 30px auto;  /* 📐 0 auto 让图片在白色卡片里水平居中，30px 让它和下面的 Login 标题留出间距 */
+           margin: 0 auto 30px auto;
            object-fit: contain;
         }
         
@@ -114,72 +114,29 @@ monolithic_html = """
             position: relative; z-index: 100;
         }
         .left-section { display: flex; align-items: center; }
-        
-        /* 学校真实 Logo 的自适应样式 */
-        .uni-logo {
-            height: 36px;
-            width: auto;
-            display: block;
-            object-fit: contain;
-        }
-        
+        .uni-logo { height: 36px; width: auto; display: block; object-fit: contain; }
         .vertical-divider { width: 1px; height: 30px; background-color: rgba(255,255,255,0.3); margin: 0 18px; }
         .sys-title-en { font-size: 16px; font-weight: 600; letter-spacing: 0.2px; }
         .right-section { display: flex; align-items: center; gap: 24px; }
         .nav-icon { fill: white; width: 18px; height: 18px; opacity: 0.95; cursor: pointer; }
         
-        /* ⚙️ 新增：高保真响应式下拉菜单容器与视觉动效样式 */
-        .user-menu-container {
-            position: relative;
-            display: inline-block;
-        }
+        .user-menu-container { position: relative; display: inline-block; }
         .user-profile { 
-            display: flex; 
-            align-items: center; 
-            gap: 6px; 
-            font-size: 14px; 
-            font-weight: 500; 
-            cursor: pointer; 
-            padding: 5px 10px;
-            border-radius: 4px;
-            user-select: none;
-            transition: background-color 0.2s;
+            display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; cursor: pointer; 
+            padding: 5px 10px; border-radius: 4px; user-select: none; transition: background-color 0.2s;
         }
         .user-profile:hover { background-color: rgba(255,255,255,0.1); }
         .caret-down { border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid white; margin-left: 2px; }
         
-        /* 下拉展开的悬浮菜单卡片 */
         .dropdown-card {
-            display: none; /* 默认隐藏 */
-            position: absolute;
-            right: 0;
-            top: 40px;
-            background-color: white;
-            min-width: 210px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            border-radius: 4px;
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
-            z-index: 999;
+            display: none; position: absolute; right: 0; top: 40px; background-color: white; min-width: 210px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15); border-radius: 4px; border: 1px solid #e2e8f0; overflow: hidden; z-index: 999;
         }
         .dropdown-card a {
-            color: #334155;
-            padding: 12px 18px;
-            text-decoration: none;
-            display: block;
-            font-size: 13.5px;
-            font-weight: 500;
-            text-align: left;
-            transition: background-color 0.2s, color 0.2s;
-            cursor: pointer;
+            color: #334155; padding: 12px 18px; text-decoration: none; display: block; font-size: 13.5px; font-weight: 500; text-align: left; transition: background-color 0.2s, color 0.2s; cursor: pointer;
         }
-        .dropdown-card a:hover {
-            background-color: #f1f5f9;
-            color: #004b93;
-        }
-        .dropdown-card.show {
-            display: block;
-        }
+        .dropdown-card a:hover { background-color: #f1f5f9; color: #004b93; }
+        .dropdown-card.show { display: block; }
 
         /* ==================== 页面 2：财务报表页样式 ==================== */
         .main-content { padding: 50px 40px; max-width: 900px; margin: 0 auto; width: 100%; text-align: left; }
@@ -190,7 +147,7 @@ monolithic_html = """
         th { background-color: #f8fafc; color: #475569; font-weight: 600; padding: 16px 24px; border-bottom: 1px solid #eef2f5; font-size: 13px; text-transform: uppercase; }
         td { padding: 18px 24px; border-bottom: 1px solid #f1f5f9; color: #334155; }
         tr:last-child td { border-bottom: none; }
-        .action-area { display: flex; justify-content: center; margin-top: 10px; }
+        .action-area { display: flex; justify(content: center); display: flex; justify-content: center; margin-top: 10px; }
         .btn-pay {
             background-color: #946912; color: white; border: none; padding: 14px 55px; font-size: 15px; border-radius: 4px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 6px rgba(148, 105, 18, 0.2);
         }
@@ -203,9 +160,29 @@ monolithic_html = """
         .info-row:last-of-type { border-bottom: none; margin-bottom: 20px; }
         .info-value { font-weight: 600; color: #111; }
         .info-value.amount { color: #946912; font-size: 18px; }
+        
+        /* ⚙️ 优化二维码区域样式，使包装层简洁干净 */
         .qr-container { background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 6px; display: inline-block; margin: 15px 0; }
-        .qr-code { width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid #cbd5e1; position: relative; margin: 0 auto; }
-        .qr-code::before { content: 'QR CODE'; font-size: 11px; color: #94a3b8; font-weight: 600; }
+        
+        /* ⚙️ 修改：现在这个容器用来完美限定并居中渲染真实的本地二维码图片 */
+        .qr-image-wrapper {
+            width: 180px;
+            height: 180px;
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            position: relative;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .qr-actual-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        
         .qr-tip { font-size: 12px; color: #64748b; margin-top: 10px; line-height: 1.4; }
         .support-footer { font-size: 13px; color: #64748b; text-align: center; margin-top: auto; padding-bottom: 20px; line-height: 1.5; width: 100%; }
         .support-footer a { color: #004b93; text-decoration: none; font-weight: 500; }
@@ -216,9 +193,7 @@ monolithic_html = """
 
     <div id="login-page">
     <div class="login-container">
-        
         <img class="login-logo" src="THE_LOGIN_LOGO_WILL_BE_INJECTED_HERE" alt="HKUST(GZ) English Logo">
-        
             <h2>Login</h2>
             <form id="loginForm">
                 <div class="form-group">
@@ -242,9 +217,7 @@ monolithic_html = """
         <div class="header-bar">
             <div class="left-section">
                 <img class="uni-logo" src="THE_FINANCE_LOGO_WILL_BE_INJECTED_HERE_A" alt="HKUST(GZ) Logo">
-                
                 <div class="vertical-divider"></div>
-                
                 <div class="sys-title-container">
                     <div class="sys-title-en">Student Finance System</div>
                 </div>
@@ -262,7 +235,6 @@ monolithic_html = """
                         <a onclick="showPage('finance-page')">💳 Student Finance System</a>
                     </div>
                 </div>
-                
             </div>
         </div>
 
@@ -316,7 +288,6 @@ monolithic_html = """
                         <a onclick="showPage('finance-page')">💳 Student Finance System</a>
                     </div>
                 </div>
-                
             </div>
         </div>
 
@@ -335,10 +306,10 @@ monolithic_html = """
                     <span>Amount Due:</span>
                     <span class="info-value amount">58,000.00 HKD</span>
                 </div>
+                
                 <div class="qr-container">
-                    <div class="qr-code">
-                        <div style="position: absolute; top:0; left:0; width:30px; height:30px; border-bottom:4px solid #004b93; border-right:4px solid #004b93;"></div>
-                        <div style="position: absolute; bottom:0; right:0; width:30px; height:30px; border-top:4px solid #004b93; border-left:4px solid #004b93;"></div>
+                    <div class="qr-image-wrapper">
+                        <img class="qr-actual-img" src="THE_QR_CODE_WILL_BE_INJECTED_HERE" alt="Payment QR Code">
                     </div>
                     <p class="qr-tip">Please scan this QR code to complete your payment transaction securely.</p>
                 </div>
@@ -356,7 +327,6 @@ monolithic_html = """
             document.getElementById('finance-page').style.display = 'none';
             document.getElementById('payment-page').style.display = 'none';
             
-            // 切换页面的时刻，强行顺手把下拉框关闭，防止浮窗遗留在下一页
             document.getElementById('dropdownMenuA').classList.remove('show');
             document.getElementById('dropdownMenuB').classList.remove('show');
             
@@ -367,9 +337,8 @@ monolithic_html = """
             }
         }
 
-        // 🛠️ 修改点 3：编写纯前端点击展开、收起以及点击外部空白区域智能自动关闭的高性能交互脚本
         function toggleDropdown(e, menuId) {
-            e.stopPropagation(); // 关键！阻止事件向上传递冒泡，否则会导致刚开就碰上了全局关闭事件
+            e.stopPropagation();
             var menu = document.getElementById(menuId);
             menu.classList.toggle('show');
         }
@@ -381,7 +350,6 @@ monolithic_html = """
             toggleDropdown(e, 'dropdownMenuB');
         });
 
-        // 监听全局：只要用户点按了非菜单区的任意空白地方，一律让菜单归位收起
         window.addEventListener('click', function() {
             document.getElementById('dropdownMenuA').classList.remove('show');
             document.getElementById('dropdownMenuB').classList.remove('show');
@@ -414,5 +382,8 @@ monolithic_html = monolithic_html.replace("THE_LOGIN_LOGO_WILL_BE_INJECTED_HERE"
 monolithic_html = monolithic_html.replace("THE_FINANCE_LOGO_WILL_BE_INJECTED_HERE_A", finance_logo_base64)
 monolithic_html = monolithic_html.replace("THE_FINANCE_LOGO_WILL_BE_INJECTED_HERE_B", finance_logo_base64)
 
-# 🚀 这三行下面就是整个 Python 文件的最后一句：把塞入了两张图片数据后的完整网页渲染出来
+# ⚙️ 新增替换：在最底部将真实的二维码 Base64 编码数据流强行灌进 HTML 的占位符中
+monolithic_html = monolithic_html.replace("THE_QR_CODE_WILL_BE_INJECTED_HERE", qr_code_base64)
+
+# 🚀 渲染出包含所有高保真图片、下拉交互功能的闭环系统网页
 components.html(monolithic_html, height=1200, scrolling=False)
