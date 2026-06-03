@@ -47,9 +47,13 @@ def get_base64_image(image_path):
         # 如果找不到本地图片，返回一个在线备用提示图，确保系统不崩溃
         return "https://via.placeholder.com/150x38/004b93/ffffff?text=Logo+Not+Found"
 
-# 🔍 路径已更新：直接读取根目录下的文件名
-logo_path = "logo_white.png" 
-logo_base64 = get_base64_image(logo_path)
+# ======= 这是本次改动新增/修改的地方 =======
+login_logo_path = "logo-en.png"           # 🔍 新增：指定登录页面的英文 Logo 文件名
+finance_logo_path = "logo_white.png"       # 🔍 保留：指定财务/缴费系统的白色页眉 Logo
+
+login_logo_base64 = get_base64_image(login_logo_path)      # 将登录 Logo 转化成二进制编码
+finance_logo_base64 = get_base64_image(finance_logo_path)  # 将页眉 Logo 转化成二进制编码
+# =========================================
 
 # 3. 将所有页面写在同一个 HTML 中，通过 JS 实现纯前端页面无感切换
 monolithic_html = """
@@ -76,14 +80,15 @@ monolithic_html = """
             position: relative; z-index: 2; background: rgba(255, 255, 255, 0.98);
             width: 420px; padding: 35px 40px; border-radius: 4px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
-        .brand-header { display: flex; align-items: center; justify-content: center; margin-bottom: 30px; }
-        .logo-placeholder {
-            width: 24px; height: 32px; background: #b38728; border-radius: 2px; margin-right: 10px; position: relative;
+        /* 控制登录框顶部新 logo-en.png 的样式 */
+       .login-logo {
+           max-width: 100%;
+           height: 50px;             /* 📐 限制新图片的高度，防止太长或变形 */
+           display: block;
+           margin: 0 auto 30px auto;  /* 📐 0 auto 让图片在白色卡片里水平居中，30px 让它和下面的 Login 标题留出间距 */
+           object-fit: contain;
         }
-        .logo-placeholder::before {
-            content: ''; position: absolute; top: -6px; left: 6px; width: 12px; height: 12px; background: #112e51; border-radius: 50%;
-        }
-        .brand-text { font-size: 11px; color: #112e51; font-weight: bold; line-height: 1.3; letter-spacing: 0.5px; text-align: left; }
+        
         .login-container h2 { font-size: 22px; color: #333333; margin-bottom: 24px; font-weight: 500; }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-size: 13px; color: #555555; margin-bottom: 8px; text-align: left; }
@@ -158,14 +163,10 @@ monolithic_html = """
 <body>
 
     <div id="login-page">
-        <div class="login-container">
-            <div class="brand-header">
-                <div class="logo-placeholder"></div>
-                <div class="brand-text">
-                    THE HONG KONG UNIVERSITY OF SCIENCE<br>
-                    AND TECHNOLOGY (GUANGZHOU)
-                </div>
-            </div>
+    <div class="login-container">
+        
+        <img class="login-logo" src="THE_LOGIN_LOGO_WILL_BE_INJECTED_HERE" alt="HKUST(GZ) English Logo">
+        
             <h2>Login</h2>
             <form id="loginForm">
                 <div class="form-group">
@@ -316,8 +317,12 @@ monolithic_html = """
 </html>
 """
 
-# 安全替换占位符
-monolithic_html = monolithic_html.replace("THE_LOGO_WILL_BE_INJECTED_HERE_A", logo_base64)
-monolithic_html = monolithic_html.replace("THE_LOGO_WILL_BE_INJECTED_HERE_B", logo_base64)
+# 将全新的登录框 logo-en.png 编码注入到第一页
+monolithic_html = monolithic_html.replace("THE_LOGIN_LOGO_WILL_BE_INJECTED_HERE", login_logo_base64)
 
+# 将原本的页眉 logo_white.png 编码注入到第二页和第三页
+monolithic_html = monolithic_html.replace("THE_FINANCE_LOGO_WILL_BE_INJECTED_HERE_A", finance_logo_base64)
+monolithic_html = monolithic_html.replace("THE_FINANCE_LOGO_WILL_BE_INJECTED_HERE_B", finance_logo_base64)
+
+# 🚀 这三行下面就是整个 Python 文件的最后一句：把塞入了两张图片数据后的完整网页渲染出来
 components.html(monolithic_html, height=1200, scrolling=False)
