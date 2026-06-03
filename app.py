@@ -189,7 +189,9 @@ monolithic_html = """
     <div id="finance-page" style="display: none;">
         <div class="header-bar">
             <div class="left-section">
-                <img class="uni-logo" src="THE_LOGO_WILL_BE_INJECTED_HERE_A" alt="HKUST(GZ) Logo">
+                <img class="uni-logo" src="app/static/logo_white.png" alt="HKUST(GZ) Logo">
+
+                <img class="uni-logo" src="THE_FINANCE_LOGO_WILL_BE_INJECTED_HERE_A" alt="HKUST(GZ) Logo">
                 
                 <div class="vertical-divider"></div>
                 
@@ -223,8 +225,8 @@ monolithic_html = """
                         <tr>
                             <td style="font-weight: 500;">Tao Ge</td>
                             <td>Admission Deposit</td>
-                            <td style="color: #d9534f; font-weight: 500;">June 30, 2026</td>
-                            <td style="font-weight: 600; color: #111;">¥ 20,000.00</td>
+                            <td style="color: #d9534f; font-weight: 500;">June 06, 2026</td>
+                            <td style="font-weight: 600; color: #111;">58,000.00 HKD</td>
                         </tr>
                     </tbody>
                 </table>
@@ -238,7 +240,9 @@ monolithic_html = """
     <div id="payment-page" style="display: none;">
         <div class="header-bar">
             <div class="left-section">
-                <img class="uni-logo" src="THE_LOGO_WILL_BE_INJECTED_HERE_B" alt="HKUST(GZ) Logo">
+                <img class="uni-logo" src="app/static/logo_white.png" alt="HKUST(GZ) Logo">
+
+                <img class="uni-logo" src="THE_FINANCE_LOGO_WILL_BE_INJECTED_HERE_B" alt="HKUST(GZ) Logo">
                 <div class="vertical-divider"></div>
                 <div class="sys-title-container">
                     <div class="sys-title-en">Student Finance System</div>
@@ -267,7 +271,7 @@ monolithic_html = """
                 </div>
                 <div class="info-row">
                     <span>Amount Due:</span>
-                    <span class="info-value amount">¥ 20,000.00</span>
+                    <span class="info-value amount">58,000.00 HKD</span>
                 </div>
                 <div class="qr-container">
                     <div class="qr-code">
@@ -279,7 +283,7 @@ monolithic_html = """
             </div>
             <div class="support-footer">
                 If you have any questions regarding your payment, please contact us at: <br>
-                <a href="mailto:admit@hkust.com">admit@hkust.com</a>
+                <a href="mailto:pgadmit@hkust-tle.hk">pgadmit@hkust-tle.hk</a>
             </div>
         </div>
     </div>
