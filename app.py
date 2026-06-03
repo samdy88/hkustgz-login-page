@@ -202,7 +202,7 @@ monolithic_html = """
                 <svg class="nav-icon" viewBox="0 0 24 24" onclick="showPage('finance-page')"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                 <svg class="nav-icon" viewBox="0 0 24 24" onclick="showPage('finance-page')"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                 <div class="user-profile">
-                    <span>Sabrina Li</span>
+                    <span>Tao Ge</span>
                     <span class="caret-down"></span>
                 </div>
             </div>
@@ -222,7 +222,7 @@ monolithic_html = """
                     </thead>
                     <tbody>
                         <tr>
-                            <td style="font-weight: 500;">Sabrina Li</td>
+                            <td style="font-weight: 500;">Tao Ge</td>
                             <td>Admission Deposit</td>
                             <td style="color: #d9534f; font-weight: 500;">June 30, 2026</td>
                             <td style="font-weight: 600; color: #111;">¥ 20,000.00</td>
@@ -249,7 +249,7 @@ monolithic_html = """
                 <svg class="nav-icon" viewBox="0 0 24 24" onclick="showPage('finance-page')"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                 <svg class="nav-icon" viewBox="0 0 24 24" onclick="showPage('finance-page')"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                 <div class="user-profile">
-                    <span>Sabrina Li</span>
+                    <span>Tao Ge</span>
                     <span class="caret-down"></span>
                 </div>
             </div>
@@ -260,7 +260,7 @@ monolithic_html = """
                 <div class="section-title">Payment Information</div>
                 <div class="info-row">
                     <span>Student Name:</span>
-                    <span class="info-value">Sabrina Li</span>
+                    <span class="info-value">Tao Ge</span>
                 </div>
                 <div class="info-row">
                     <span>Fee Type:</span>
